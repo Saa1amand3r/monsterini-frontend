@@ -67,15 +67,23 @@ function Navbar({ session, setSession }) {
             {isOpen && (
                 <ul className="md:hidden flex flex-col items-center gap-3 pb-4 bg-[#fdf3e6] shadow">
                     <li>
-                        <Link to="/" className="block py-2 px-4 rounded hover:bg-accent-light/20 transition" onClick={() => setIsOpen(false)}>Home</Link>
+                        <Link to="/" className="block py-2 px-4 rounded hover:bg-accent-light/20 transition"
+                              onClick={() => setIsOpen(false)}>Home</Link>
+                    </li>
+                    <li>
+                        <Link to="/leaderboard" onClick={() => setIsOpen(false)}>Leaderboard</Link>
                     </li>
                     {!session && (
                         <>
                             <li>
-                                <Link to="/register" className="block py-2 px-4 rounded hover:bg-accent-light/20 transition" onClick={() => setIsOpen(false)}>Register</Link>
+                                <Link to="/register"
+                                      className="block py-2 px-4 rounded hover:bg-accent-light/20 transition"
+                                      onClick={() => setIsOpen(false)}>Register</Link>
                             </li>
                             <li>
-                                <Link to="/login" className="block py-2 px-4 rounded hover:bg-accent-light/20 transition" onClick={() => setIsOpen(false)}>Login</Link>
+                                <Link to="/login"
+                                      className="block py-2 px-4 rounded hover:bg-accent-light/20 transition"
+                                      onClick={() => setIsOpen(false)}>Login</Link>
                             </li>
                         </>
                     )}

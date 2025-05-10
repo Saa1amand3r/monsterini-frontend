@@ -6,6 +6,7 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisteringPage from "./pages/RegisteringPage";
 import Questionnaire from "./pages/Questionnaire";
+import LeaderboardPage from "./pages/LeaderBoard";
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<LoginPage setSession={setSession} />} />
+                <Route path="/leaderboard" element={<LeaderboardPage/>}></Route>
                 <Route path="/register" element={<RegisteringPage setSession={setSession} />} />
                 <Route path={"/questionnaire"} element={<Questionnaire session={session?.id}/>} />
             </Routes>

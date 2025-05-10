@@ -22,10 +22,15 @@ const HomePage = () => {
     const [gameOver, setGameOver] = useState(false);
     const [userPicksANumberShow, setUserPicksANumberShow] = useState(false)
     const [wePickANumberShow, setWePickANumberShow] = useState(false)
+    const [showInput, setShowInput] = useState(false);
+    const [inputValue, setInputValue] = useState("");
+
+
 
     const promptHandler = () => {
-        alert("Prompt triggered");
+        showInput(true); // triggers the UI to appear
     };
+
 
     const randomSideQuestHandler = () => {
         setBoard(initialBoard);
@@ -133,81 +138,126 @@ const HomePage = () => {
                 </MapContainer>
 
                 {/* Overlay Buttons */}
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center space-y-2">
-                    {!showSplitButtons && (
+                <div
+                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center space-y-2">
+
+                    {!showSplitButtons && !showInput && (
                         <motion.button
                             className="flex flex-row items-center gap-3 bg-accent-light text-white px-4 py-2 rounded-2xl shadow-md hover:bg-accent-dark"
                             onClick={() => setShowSplitButtons(true)}
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ duration: 0.3 }}
+                            initial={{scale: 0.8, opacity: 0}}
+                            animate={{scale: 1, opacity: 1}}
+                            exit={{scale: 0.8, opacity: 0}}
+                            transition={{duration: 0.3}}
                         >
-                            <FaPlay className="w-4 h-4" />
+                            <FaPlay className="w-4 h-4"/>
                             Start Quest
                         </motion.button>
                     )}
 
                     <AnimatePresence>
-                        {showSplitButtons && (
-                            <>
-                                <motion.button
-                                    key="preferences"
+                        {showSplitButtons && !showInput && (
+                            <motion.div
+                                key="button-group"
+                                initial={{opacity: 0, y: 20}}
+                                animate={{opacity: 1, y: 0}}
+                                exit={{opacity: 0, y: 20}}
+                                transition={{duration: 0.3}}
+                                className="flex flex-col items-center space-y-2"
+                            >
+                                <button
                                     className="bg-accent-dark text-white px-4 py-2 rounded-xl shadow-md"
-                                    initial={{ x: -20, opacity: 0 }}
-                                    animate={{ x: 0, opacity: 1 }}
-                                    exit={{ x: -20, opacity: 0 }}
-                                    transition={{ duration: 0.3 }}
-                                    onClick={promptHandler}
+                                    onClick={() => {
+                                        setShowInput(true);
+                                        setShowSplitButtons(false);
+                                    }}
                                 >
                                     Enter Preferences
-                                </motion.button>
-
-                                <motion.button
-                                    key="sidequest"
+                                </button>
+                                <button
                                     className="bg-accent-dark text-white px-4 py-2 rounded-xl shadow-md"
-                                    initial={{ x: 20, opacity: 0 }}
-                                    animate={{ x: 0, opacity: 1 }}
-                                    exit={{ x: 20, opacity: 0 }}
-                                    transition={{ duration: 0.3 }}
                                     onClick={randomSideQuestHandler}
                                 >
                                     Today's Side Quest
-                                </motion.button>
-                            </>
+                                </button>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    <AnimatePresence>
+                        {showInput && (
+                            <motion.div
+                                key="input-group"
+                                initial={{opacity: 0, y: 20}}
+                                animate={{opacity: 1, y: 0}}
+                                exit={{opacity: 0, y: 20}}
+                                transition={{duration: 0.3}}
+                                className="flex flex-col items-center space-y-2"
+                            >
+                                <input
+                                    type="text"
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    placeholder="Enter your preference"
+                                    className="px-4 py-2 rounded-lg border-2 border-gray-400 focus-within:border-none focus:ring-2 focus:ring-orange-400 w-64"
+                                />
+                                <div className="flex gap-2">
+                                    <button
+                                        className="bg-accent-main text-white px-4 py-2 rounded-lg"
+                                        onClick={() => {
+                                            // You can do something with inputValue here
+                                            alert(`Submitted: ${inputValue}`);
+                                            setShowInput(false);
+                                        }}
+                                    >
+                                        Submit
+                                    </button>
+                                    <button
+                                        className="bg-accent-dark text-white px-4 py-2 rounded-lg"
+                                        onClick={() => {
+                                            setShowInput(false);
+                                            setShowSplitButtons(true);
+                                        }}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </motion.div>
                         )}
                     </AnimatePresence>
                 </div>
+
             </div>
 
             {/* Stats Cards */}
             <div className="flex flex-col md:flex-row gap-4 w-[80%] justify-center">
                 <Card title="Level 12" desc="Explorer">
-                    <FaStar className="text-accent-light w-7 h-7" />
+                    <FaStar className="text-accent-light w-7 h-7"/>
                 </Card>
                 <Card title="2450 XP" desc="Experience">
-                    <FaTrophy className="text-accent-light w-7 h-7" />
+                    <FaTrophy className="text-accent-light w-7 h-7"/>
                 </Card>
                 <Card title="28" desc="Places Visited">
-                    <FaMapLocation className="text-accent-light w-7 h-7" />
+                    <FaMapLocation className="text-accent-light w-7 h-7"/>
                 </Card>
                 <Card title="#42" desc="Ranking">
-                    <FaCrown className="text-accent-light w-7 h-7" />
+                    <FaCrown className="text-accent-light w-7 h-7"/>
                 </Card>
             </div>
 
             {/* Clickable Cards */}
             <div className="flex flex-col md:flex-row gap-4 w-[80%] justify-center">
                 <CardClickable title="Questionnaire" link="/questionnaire">
-                    <FaClipboard className="text-accent-dark w-7 h-7" />
+                    <FaClipboard className="text-accent-dark w-7 h-7"/>
                 </CardClickable>
                 <CardClickable title="Preferences" link="/settings">
-                    <FaSliders className="text-accent-dark w-7 h-7" />
+                    <FaSliders className="text-accent-dark w-7 h-7"/>
                 </CardClickable>
                 <CardClickable title="History" link="/history">
-                    <FaHistory className="text-accent-dark w-7 h-7" />
+                    <FaHistory className="text-accent-dark w-7 h-7"/>
                 </CardClickable>
                 <CardClickable title="Leaderboard" link="/leaderboard">
-                    <FaRankingStar className="text-accent-dark w-7 h-7" />
+                    <FaRankingStar className="text-accent-dark w-7 h-7"/>
                 </CardClickable>
             </div>
 
@@ -215,7 +265,7 @@ const HomePage = () => {
             <div className="text-left w-[80%]">
                 <h2 className="text-2xl text-accent-dark font-bold text-left">Recent Activity</h2>
             </div>
-            <RecentActivity />
+            <RecentActivity/>
 
             {/* Modal */}
             {showModal && (

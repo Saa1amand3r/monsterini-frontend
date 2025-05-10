@@ -18,7 +18,7 @@ function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<LoginPage setSession={setSession} />} />
                 <Route path="/register" element={<RegisteringPage setSession={setSession} />} />
-                <Route path={"/questionnaire"} element={<Questionnaire/>} />
+                <Route path={"/questionnaire"} element={<Questionnaire session={session?.id}/>} />
             </Routes>
         </Router>
     );

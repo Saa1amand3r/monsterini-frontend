@@ -9,7 +9,10 @@ const LoginPage = ({ setSession }) => {
     const handleLogin = async () => {
         try {
             const res = await fetch(`http://localhost:8080/api/users/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`, {
-                method: "POST"
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                }
             });
 
             if (!res.ok) throw new Error("Login failed");

@@ -1,7 +1,7 @@
 import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import {
-    FaClipboard, FaCrown, FaHistory, FaPlay, FaStar, FaTrophy
+    FaClipboard, FaCrown, FaHistory, FaMapMarkerAlt, FaPlay, FaStar, FaTrophy
 } from "react-icons/fa";
 import {FaMapLocation, FaRankingStar, FaSliders} from "react-icons/fa6";
 import {motion, AnimatePresence} from "framer-motion";
@@ -12,6 +12,8 @@ import RecentActivity from "../components/RecentActivity";
 import UserPicksNumber from "../components/UserPicksNumber";
 import WePickNumber from "../components/WePickNumber";
 import axios from "axios";
+import {renderToStaticMarkup} from "react-dom/server";
+import L from "leaflet";
 
 const initialBoard = Array(9).fill(null);
 
@@ -28,6 +30,17 @@ const HomePage = ({session}) => {
     const [count, setCount] = useState(1)
     const [sideQuestPoints, setSideQuestPoints] = useState([]);
     const [showOverlay, setShowOverlay] = useState(true);
+
+    const iconMarkup = renderToStaticMarkup(
+        <FaMapMarkerAlt style={{ color: "#FF5722", width: "32px", height: "32px" }} />
+    );
+
+    const customIcon = new L.DivIcon({
+        html: iconMarkup,
+        className: "",          // remove default styles
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+    });
 
 
 
@@ -134,31 +147,17 @@ const HomePage = ({session}) => {
 
             setSideQuestPoints(response.data); // assuming response.data is the array
             setShowOverlay(false);
-            // Chatgpt, I need you to add code in order to parse response with this structure:
-            /*
-            [
-  {
-    "id": 0,
-    "type": "string",
-    "tags": "string",
-    "lat": 0,
-    "lon": 0,
-    "points": 0
-  }
-]
-             */
-            // I need you to show the points on the map
         }
     };
     return (
-        <main className="flex flex-col items-center bg-background-default h-[100%] md:h-screen gap-4 p-4">
+        <main className="flex flex-col items-center bg-background-default min-h-screen gap-4 p-4">
             <h1 className="text-accent-main text-6xl font-bold text-center">Welcome to CityQuest</h1>
             <p className="text-gray-600 text-center max-w-md text-md font-semibold mb-5">
                 Explore your city, earn rewards, and unlock new adventures!
             </p>
 
             {/* Map Container with overlayed button(s) */}
-            <div className="relative w-[80%] h-96">
+            <div className="relative w-[80%] h-[60vh]">
                 <MapContainer
                     center={[51.2194, 4.4025]}
                     zoom={13}
@@ -170,7 +169,7 @@ const HomePage = ({session}) => {
                         attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
                     />
                     {sideQuestPoints.map((point, idx) => (
-                        <Marker key={idx} position={[point.lat, point.lon]}>
+                        <Marker key={idx} position={[point.lat, point.lon]} icon={customIcon}>
                             <Popup>
                                 <div>
                                     <p><strong>Type:</strong> {point.type}</p>

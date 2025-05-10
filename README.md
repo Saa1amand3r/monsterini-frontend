@@ -1,4 +1,8 @@
 # CityQuest 
+## Github Repo's
+backend: https://github.com/Daniil0-0/monsterini-backendini/settings
+frontend: https://github.com/Saa1amand3r/monsterini-frontend
+## CityQuest - find yourself in the city
 is a Pokémon GO-inspired web app designed to help you uncover the hidden gems of Antwerp. Instead of chasing creatures, you're chasing culture—earning XP by discovering new and niche locations around the city. The twist? The more underground the spot, the more XP you rack up! Well-known tourist locations give you just a bit, but stumble upon that secret café or forgotten art alley, and you’ll level up fast.
 
 It all starts with a fun, personalized questionnaire to get to know your vibe. Based on your answers, our AI crafts recommendations tailored just for you. Ready for adventure? You can start a quest by submitting a custom prompt for a personalized route—or test your fate in a Tic-Tac-Toe battle against the bot! Win, and you get to pick your path. Lose, and the gods of randomness will choose your SideQuest for the day.

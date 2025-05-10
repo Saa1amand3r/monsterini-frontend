@@ -26,6 +26,9 @@ function Navbar({ session, setSession }) {
                     <li>
                         <Link to="/" className="hover:text-accent-main transition">Home</Link>
                     </li>
+                    <li>
+                        <Link to="/leaderboard" className="hover:text-accent-main transition">Leaderboard</Link>
+                    </li>
                     {!session && (
                         <>
                             <li>

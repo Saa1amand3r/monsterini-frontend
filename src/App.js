@@ -16,7 +16,7 @@ function App() {
         <Router>
             <Navbar session={session} />
             <Routes>
-                <Route path="/" element={<HomePage />} />
+                <Route path="/" element={<HomePage session={session}/>} />
                 <Route path="/login" element={<LoginPage setSession={setSession} />} />
                 <Route path="/leaderboard" element={<LeaderboardPage/>}></Route>
                 <Route path="/register" element={<RegisteringPage setSession={setSession} />} />

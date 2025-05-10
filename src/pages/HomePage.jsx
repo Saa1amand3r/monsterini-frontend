@@ -1,20 +1,21 @@
-import { MapContainer, TileLayer } from "react-leaflet";
+import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import {
     FaClipboard, FaCrown, FaHistory, FaPlay, FaStar, FaTrophy
 } from "react-icons/fa";
-import { FaMapLocation, FaRankingStar, FaSliders } from "react-icons/fa6";
-import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import {FaMapLocation, FaRankingStar, FaSliders} from "react-icons/fa6";
+import {motion, AnimatePresence} from "framer-motion";
+import {useState} from "react";
 import Card from "../components/Card";
 import CardClickable from "../components/CardClickable";
 import RecentActivity from "../components/RecentActivity";
 import UserPicksNumber from "../components/UserPicksNumber";
 import WePickNumber from "../components/WePickNumber";
+import axios from "axios";
 
 const initialBoard = Array(9).fill(null);
 
-const HomePage = () => {
+const HomePage = ({session}) => {
     const [showSplitButtons, setShowSplitButtons] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [board, setBoard] = useState(initialBoard);
@@ -24,12 +25,10 @@ const HomePage = () => {
     const [wePickANumberShow, setWePickANumberShow] = useState(false)
     const [showInput, setShowInput] = useState(false);
     const [inputValue, setInputValue] = useState("");
+    const [count, setCount] = useState(1)
+    const [sideQuestPoints, setSideQuestPoints] = useState([]);
+    const [showOverlay, setShowOverlay] = useState(true);
 
-
-
-    const promptHandler = () => {
-        showInput(true); // triggers the UI to appear
-    };
 
 
     const randomSideQuestHandler = () => {
@@ -116,6 +115,40 @@ const HomePage = () => {
         setWePickANumberShow(true)
     }
 
+    const sendPromptRequestForSideQuest = async () => {
+        console.log(inputValue)
+        if (inputValue === "") {
+            alert("Coming soon!");
+        } else {
+            const data = {
+                "userId": session.id,
+                "preference": inputValue,
+                "count": count
+            }
+            const response = await axios.post("http://localhost:8080/api/sidequest/generate", data)
+            if (response.status !== 200) {
+                alert("Error occured! Try to reload the page.")
+                return;
+            }
+
+            setSideQuestPoints(response.data); // assuming response.data is the array
+            setShowOverlay(false);
+            // Chatgpt, I need you to add code in order to parse response with this structure:
+            /*
+            [
+  {
+    "id": 0,
+    "type": "string",
+    "tags": "string",
+    "lat": 0,
+    "lon": 0,
+    "points": 0
+  }
+]
+             */
+            // I need you to show the points on the map
+        }
+    };
     return (
         <main className="flex flex-col items-center bg-background-default h-screen gap-4 p-4">
             <h1 className="text-accent-main text-6xl font-bold">Welcome to CityQuest</h1>
@@ -126,7 +159,7 @@ const HomePage = () => {
             {/* Map Container with overlayed button(s) */}
             <div className="relative w-[80%] h-[30%]">
                 <MapContainer
-                    center={[51.505, -0.09]}
+                    center={[51.2194, 4.4025]}
                     zoom={13}
                     scrollWheelZoom={false}
                     className="h-full w-full rounded-md z-0"
@@ -135,98 +168,114 @@ const HomePage = () => {
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
                     />
+                    {sideQuestPoints.map((point, idx) => (
+                        <Marker key={idx} position={[point.lat, point.lon]}>
+                            <Popup>
+                                <div>
+                                    <p><strong>Type:</strong> {point.type}</p>
+                                    <p><strong>Tags:</strong> {point.tags}</p>
+                                    <p><strong>Points:</strong> {point.points}</p>
+                                </div>
+                            </Popup>
+                        </Marker>
+                    ))}
+                    
                 </MapContainer>
 
                 {/* Overlay Buttons */}
-                <div
-                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center space-y-2">
+                {showOverlay && (
+                    <div
+                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center space-y-2">
 
-                    {!showSplitButtons && !showInput && (
-                        <motion.button
-                            className="flex flex-row items-center gap-3 bg-accent-light text-white px-4 py-2 rounded-2xl shadow-md hover:bg-accent-dark"
-                            onClick={() => setShowSplitButtons(true)}
-                            initial={{scale: 0.8, opacity: 0}}
-                            animate={{scale: 1, opacity: 1}}
-                            exit={{scale: 0.8, opacity: 0}}
-                            transition={{duration: 0.3}}
-                        >
-                            <FaPlay className="w-4 h-4"/>
-                            Start Quest
-                        </motion.button>
-                    )}
-
-                    <AnimatePresence>
-                        {showSplitButtons && !showInput && (
-                            <motion.div
-                                key="button-group"
-                                initial={{opacity: 0, y: 20}}
-                                animate={{opacity: 1, y: 0}}
-                                exit={{opacity: 0, y: 20}}
+                        {!showSplitButtons && !showInput && (
+                            <motion.button
+                                className="flex flex-row items-center gap-3 bg-accent-light text-white px-4 py-2 rounded-2xl shadow-md hover:bg-accent-dark"
+                                onClick={() => setShowSplitButtons(true)}
+                                initial={{scale: 0.8, opacity: 0}}
+                                animate={{scale: 1, opacity: 1}}
+                                exit={{scale: 0.8, opacity: 0}}
                                 transition={{duration: 0.3}}
-                                className="flex flex-col items-center space-y-2"
                             >
-                                <button
-                                    className="bg-accent-dark text-white px-4 py-2 rounded-xl shadow-md"
-                                    onClick={() => {
-                                        setShowInput(true);
-                                        setShowSplitButtons(false);
-                                    }}
-                                >
-                                    Enter Preferences
-                                </button>
-                                <button
-                                    className="bg-accent-dark text-white px-4 py-2 rounded-xl shadow-md"
-                                    onClick={randomSideQuestHandler}
-                                >
-                                    Today's Side Quest
-                                </button>
-                            </motion.div>
+                                <FaPlay className="w-4 h-4"/>
+                                Start Quest
+                            </motion.button>
                         )}
-                    </AnimatePresence>
 
-                    <AnimatePresence>
-                        {showInput && (
-                            <motion.div
-                                key="input-group"
-                                initial={{opacity: 0, y: 20}}
-                                animate={{opacity: 1, y: 0}}
-                                exit={{opacity: 0, y: 20}}
-                                transition={{duration: 0.3}}
-                                className="flex flex-col items-center space-y-2"
-                            >
-                                <input
-                                    type="text"
-                                    value={inputValue}
-                                    onChange={(e) => setInputValue(e.target.value)}
-                                    placeholder="Enter your preference"
-                                    className="px-4 py-2 rounded-lg border-2 border-gray-400 focus-within:border-none focus:ring-2 focus:ring-orange-400 w-64"
-                                />
-                                <div className="flex gap-2">
+                        <AnimatePresence>
+                            {showSplitButtons && !showInput && (
+                                <motion.div
+                                    key="button-group"
+                                    initial={{opacity: 0, y: 20}}
+                                    animate={{opacity: 1, y: 0}}
+                                    exit={{opacity: 0, y: 20}}
+                                    transition={{duration: 0.3}}
+                                    className="flex flex-col items-center space-y-2"
+                                >
                                     <button
-                                        className="bg-accent-main text-white px-4 py-2 rounded-lg"
+                                        className="bg-accent-dark text-white px-4 py-2 rounded-xl shadow-md"
                                         onClick={() => {
-                                            // You can do something with inputValue here
-                                            alert(`Submitted: ${inputValue}`);
-                                            setShowInput(false);
+                                            setShowInput(true);
+                                            setShowSplitButtons(false);
+
                                         }}
                                     >
-                                        Submit
+                                        Enter Preferences
                                     </button>
                                     <button
-                                        className="bg-accent-dark text-white px-4 py-2 rounded-lg"
-                                        onClick={() => {
-                                            setShowInput(false);
-                                            setShowSplitButtons(true);
-                                        }}
+                                        className="bg-accent-dark text-white px-4 py-2 rounded-xl shadow-md"
+                                        onClick={randomSideQuestHandler}
                                     >
-                                        Cancel
+                                        Today's Side Quest
                                     </button>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
 
+                        <AnimatePresence>
+                            {showInput && (
+                                <motion.div
+                                    key="input-group"
+                                    initial={{opacity: 0, y: 20}}
+                                    animate={{opacity: 1, y: 0}}
+                                    exit={{opacity: 0, y: 20}}
+                                    transition={{duration: 0.3}}
+                                    className="flex flex-col items-center space-y-2"
+                                >
+                                    <input
+                                        type="text"
+                                        value={inputValue}
+                                        onChange={(e) => setInputValue(e.target.value)}
+                                        placeholder="Enter your preference"
+                                        className="px-4 py-2 rounded-lg border-2 border-gray-400 focus-within:border-none focus:ring-2 focus:ring-orange-400 w-64"
+                                    />
+                                    <div className="flex gap-2">
+                                        <button
+                                            className="bg-accent-main text-white px-4 py-2 rounded-lg"
+                                            onClick={() => {
+                                                // You can do something with inputValue here
+                                                setShowInput(false);
+                                                wePickANumber()
+                                                sendPromptRequestForSideQuest();
+                                            }}
+                                        >
+                                            Submit
+                                        </button>
+                                        <button
+                                            className="bg-accent-dark text-white px-4 py-2 rounded-lg"
+                                            onClick={() => {
+                                                setShowInput(false);
+                                                setShowSplitButtons(true);
+                                            }}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                )}
             </div>
 
             {/* Stats Cards */}
@@ -272,11 +321,14 @@ const HomePage = () => {
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-xl p-6 w-80">
                         {userPicksANumberShow && (
-                            <UserPicksNumber setShowModal={setShowModal}/>
+                            <UserPicksNumber setShowModal={setShowModal} onConfirm={setCount}/>
                         )}
 
                         {wePickANumberShow && (
-                            <WePickNumber setShowModal={setShowModal}/>
+                            <WePickNumber setShowModal={setShowModal} onConfirm={(val) => {
+                                setCount(val)
+                                sendPromptRequestForSideQuest()
+                            }}/>
                         )}
 
                         {!userPicksANumberShow && !wePickANumberShow && (

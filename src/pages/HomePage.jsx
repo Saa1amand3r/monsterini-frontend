@@ -5,7 +5,7 @@ import {
 } from "react-icons/fa";
 import {FaMapLocation, FaRankingStar, FaSliders} from "react-icons/fa6";
 import {motion, AnimatePresence} from "framer-motion";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import Card from "../components/Card";
 import CardClickable from "../components/CardClickable";
 import RecentActivity from "../components/RecentActivity";
@@ -14,6 +14,8 @@ import WePickNumber from "../components/WePickNumber";
 import axios from "axios";
 import {renderToStaticMarkup} from "react-dom/server";
 import L from "leaflet";
+import AcceptanceList from "../components/AcceptanceList";
+import {Link} from "react-router-dom";
 
 const initialBoard = Array(9).fill(null);
 
@@ -30,10 +32,12 @@ const HomePage = ({session}) => {
     const [count, setCount] = useState(1)
     const [sideQuestPoints, setSideQuestPoints] = useState([]);
     const [showOverlay, setShowOverlay] = useState(true);
+    const [hideMap, setHideMap] = useState(false)
+    const [xp, setXp] = useState(session?.xp)
     const [showLoginWarning, setShowLoginWarning] = useState(false);
 
     const iconMarkup = renderToStaticMarkup(
-        <FaMapMarkerAlt style={{ color: "#FF5722", width: "32px", height: "32px" }} />
+        <FaMapMarkerAlt style={{color: "#FF5722", width: "32px", height: "32px"}}/>
     );
 
     const customIcon = new L.DivIcon({
@@ -42,7 +46,6 @@ const HomePage = ({session}) => {
         iconSize: [32, 32],
         iconAnchor: [16, 32],
     });
-
 
 
     const randomSideQuestHandler = () => {
@@ -169,213 +172,222 @@ const HomePage = ({session}) => {
             <p className="text-gray-600 text-center max-w-md text-md font-semibold mb-5">
                 Explore your city, earn rewards, and unlock new adventures!
             </p>
-            <AnimatePresence>
-                {showOverlay && (
-                    <motion.div
-                        key="npc-bubble"
-                        initial={{y: -20, opacity: 0}}
-                        animate={{
-                            y: [0, -4, 0, 4, 0],
-                            opacity: 1,
-                            scale: [1, 1.02, 1],
-                        }}
-                        exit={{y: -20, opacity: 0}}
-                        transition={{
-                            y: {repeat: Infinity, duration: 3, ease: "easeInOut"},
-                            scale: {repeat: Infinity, duration: 4, ease: "easeInOut"},
-                        }}
-                        className="bg-white rounded-xl p-4 shadow-lg border-2 border-accent-main max-w-lg text-center mt-2 relative"
-                    >
+
+            {!session && (
+                <>
+                    <h2 className="text-gray-600 font-semibold ">Login or register to start!</h2>
+                    <div className="flex flex-row gap-2 justify-center">
+                        <Link className="bg-accent-main text-white px-6 py-4 font-bold rounded-xl hover:bg-accent-light"
+                              to="/login">Login</Link>
+                        <Link className="bg-accent-main text-white px-6 py-4 font-bold rounded-xl hover:bg-accent-light"
+                              to="/register">Register</Link>
+                    </div>
+                </>
+
+            )}
+            {session && (
+                <>
+                <AnimatePresence>
+                    {showOverlay && (
                         <motion.div
-                            className="absolute -top-8 left-1/2 transform -translate-x-1/2"
-                            animate={{y: [0, -6, 0, 6, 0]}}
-                            transition={{repeat: Infinity, duration: 2, ease: "easeInOut"}}
+                            key="npc-bubble"
+                            initial={{y: -20, opacity: 0}}
+                            animate={{
+                                y: [0, -4, 0, 4, 0],
+                                opacity: 1,
+                                scale: [1, 1.02, 1],
+                            }}
+                            exit={{y: -20, opacity: 0}}
+                            transition={{
+                                y: {repeat: Infinity, duration: 3, ease: "easeInOut"},
+                                scale: {repeat: Infinity, duration: 4, ease: "easeInOut"},
+                            }}
+                            className="bg-white rounded-xl p-4 shadow-lg border-2 border-accent-main max-w-lg text-center mt-2 relative"
                         >
-                            <div className="relative w-14 h-14 flex items-center justify-center">
-                                <div
-                                    className="absolute w-14 h-14 bg-yellow-300 rounded-full blur-lg opacity-40 animate-pulse z-0"></div>
-                                <div className="text-5xl relative z-10">🧙</div>
-                            </div>
+                            <motion.div
+                                className="absolute -top-8 left-1/2 transform -translate-x-1/2"
+                                animate={{y: [0, -6, 0, 6, 0]}}
+                                transition={{repeat: Infinity, duration: 2, ease: "easeInOut"}}
+                            >
+                                <div className="relative w-14 h-14 flex items-center justify-center">
+                                    <div
+                                        className="absolute w-14 h-14 bg-yellow-300 rounded-full blur-lg opacity-40 animate-pulse z-0"></div>
+                                    <div className="text-5xl relative z-10">🧙</div>
+                                </div>
+                            </motion.div>
+
+                            <p className="text-gray-600 text-center max-w-md text-xs sm:text-sm font-semibold mb-5">
+
+                                Welcome, traveler! Ready to begin your CityQuest adventure?
+                            </p>
                         </motion.div>
 
-                        <p className="text-gray-600 text-center max-w-md text-xs sm:text-sm font-semibold mb-5">
-
-                            Welcome, traveler! Ready to begin your CityQuest adventure?
-                        </p>
-                    </motion.div>
-
-                )}
-            </AnimatePresence>
-
-
-            {/* Map Section in White Card */}
-            <div
-                className="w-full max-w-screen-sm md:max-w-screen-md lg:max-w-[80%] bg-white rounded-xl shadow-md p-4 relative">
-                <h2 className="text-lg font-semibold text-accent-dark mb-2 text-center">Your Quest Map</h2>
-                <div className="h-[60vh] rounded-md overflow-hidden relative">
-                    <MapContainer
-                        center={[51.2194, 4.4025]}
-                        zoom={13}
-                        scrollWheelZoom={false}
-                        className="h-full w-full z-0"
-                    >
-                        <TileLayer
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-                        />
-                        {sideQuestPoints.map((point, idx) => (
-                            <Marker key={idx} position={[point.lat, point.lon]} icon={customIcon}>
-                                <Popup>
-                                    <div>
-                                        <p><strong>Type:</strong> {point.type}</p>
-                                        <p><strong>Tags:</strong> {point.tags}</p>
-                                        <p><strong>Points:</strong> {point.points}</p>
-                                    </div>
-                                </Popup>
-                            </Marker>
-                        ))}
-                    </MapContainer>
-
-                    {/* Overlay Buttons */}
-                    {showOverlay && (
-                        <div
-                            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center space-y-2">
-                            {/* Buttons here (unchanged) */}
-                        </div>
                     )}
+                </AnimatePresence>
+                {
+                    !hideMap && (
+                        <>
+                            {/* Map Container with overlayed button(s) */}
+                            <div className="relative w-[80%] h-[60vh]">
+                                <MapContainer
+                                    center={[51.2194, 4.4025]}
+                                    zoom={13}
+                                    scrollWheelZoom={false}
+                                    className="h-full w-full rounded-md z-0"
+                                >
+                                    <TileLayer
+                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                        attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+                                    />
+                                    {sideQuestPoints.map((point, idx) => (
+                                        <Marker className={`${point?.hidden ? 'hidden' : ''}`} key={idx}
+                                                position={[point.lat, point.lon]} icon={customIcon}>
+                                            <Popup>
+                                                <div>
+                                                    <p><strong>Type:</strong> {point.type}</p>
+                                                    <p><strong>Tags:</strong> {point.tags}</p>
+                                                    <p><strong>Points:</strong> 100 XP</p>
+                                                </div>
+                                            </Popup>
+                                        </Marker>
+                                    ))}
+
+                                </MapContainer>
+
+                                {/* Overlay Buttons */}
+                                {showOverlay && (
+                                    <div
+                                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center space-y-2">
+
+                                        {!showSplitButtons && !showInput && (
+                                            <motion.button
+                                                className="flex flex-row items-center gap-3 bg-accent-light text-white px-4 py-2 rounded-2xl shadow-md hover:bg-accent-dark"
+                                                onClick={() => setShowSplitButtons(true)}
+                                                initial={{scale: 0.8, opacity: 0}}
+                                                animate={{scale: 1, opacity: 1}}
+                                                exit={{scale: 0.8, opacity: 0}}
+                                                transition={{duration: 0.3}}
+                                            >
+                                                <FaPlay className="w-4 h-4"/>
+                                                Start Quest
+                                            </motion.button>
+                                        )}
+
+                                        <AnimatePresence>
+                                            {showSplitButtons && !showInput && (
+                                                <motion.div
+                                                    key="button-group"
+                                                    initial={{opacity: 0, y: 20}}
+                                                    animate={{opacity: 1, y: 0}}
+                                                    exit={{opacity: 0, y: 20}}
+                                                    transition={{duration: 0.3}}
+                                                    className="flex flex-col items-center space-y-2"
+                                                >
+                                                    <button
+                                                        className="bg-accent-dark text-white px-4 py-2 rounded-xl shadow-md"
+                                                        onClick={() => {
+                                                            setShowInput(true);
+                                                            setShowSplitButtons(false);
+
+                                                        }}
+                                                    >
+                                                        Enter Preferences
+                                                    </button>
+                                                    <button
+                                                        className="bg-accent-dark text-white px-4 py-2 rounded-xl shadow-md"
+                                                        onClick={randomSideQuestHandler}
+                                                    >
+                                                        Today's Side Quest
+                                                    </button>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+
+                                        <AnimatePresence>
+                                            {showInput && (
+                                                <motion.div
+                                                    key="input-group"
+                                                    initial={{opacity: 0, y: 20}}
+                                                    animate={{opacity: 1, y: 0}}
+                                                    exit={{opacity: 0, y: 20}}
+                                                    transition={{duration: 0.3}}
+                                                    className="flex flex-col items-center space-y-2"
+                                                >
+                                                    <input
+                                                        type="text"
+                                                        value={inputValue}
+                                                        onChange={(e) => setInputValue(e.target.value)}
+                                                        placeholder="Enter your preference"
+                                                        className="px-4 py-2 rounded-lg border-2 border-gray-400 focus-within:border-none focus:ring-2 focus:ring-orange-400 w-64"
+                                                    />
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            className="bg-accent-main text-white px-4 py-2 rounded-lg"
+                                                            onClick={() => {
+                                                                // You can do something with inputValue here
+                                                                setShowInput(false);
+                                                                wePickANumber()
+                                                                sendPromptRequestForSideQuest();
+                                                            }}
+                                                        >
+                                                            Submit
+                                                        </button>
+                                                        <button
+                                                            className="bg-accent-dark text-white px-4 py-2 rounded-lg"
+                                                            onClick={() => {
+                                                                setShowInput(false);
+                                                                setShowSplitButtons(true);
+                                                            }}
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+
+                                )}
+                            </div>
+                        </>
+                    )
+                }
+
+                {sideQuestPoints.length > 0 && (
+                    <AcceptanceList session={session} points={sideQuestPoints} setHideMap={setHideMap} setXp={setXp}/>
+                )}
+
+                {/* Stats Cards */}
+                <div className="flex flex-col md:flex-row gap-4 w-[80%] justify-center">
+                    <Card title="Level 12" desc="Explorer">
+                        <FaStar className="text-accent-light w-7 h-7"/>
+                    </Card>
+                    <Card title={`${xp} XP`} desc="Experience">
+                        <FaTrophy className="text-accent-light w-7 h-7"/>
+                    </Card>
+                    <Card title="28" desc="Places Visited">
+                        <FaMapLocation className="text-accent-light w-7 h-7"/>
+                    </Card>
+                    <Card title="#42" desc="Ranking">
+                        <FaCrown className="text-accent-light w-7 h-7"/>
+                    </Card>
                 </div>
 
-
-                {/* Overlay Buttons */}
-                {showOverlay && (
-                    <div
-                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center space-y-2">
-
-                        {!showSplitButtons && !showInput && (
-                            <motion.button
-                                className="flex flex-row items-center gap-3 bg-accent-light text-white px-4 py-2 rounded-2xl shadow-md hover:bg-accent-dark"
-                                onClick={() => setShowSplitButtons(true)}
-                                initial={{scale: 0.8, opacity: 0}}
-                                animate={{scale: 1, opacity: 1}}
-                                exit={{scale: 0.8, opacity: 0}}
-                                transition={{duration: 0.3}}
-                            >
-                                <FaPlay className="w-4 h-4"/>
-                                Start Quest
-                            </motion.button>
-                        )}
-
-                        <AnimatePresence>
-                            {showSplitButtons && !showInput && (
-                                <motion.div
-                                    key="button-group"
-                                    initial={{opacity: 0, y: 20}}
-                                    animate={{opacity: 1, y: 0}}
-                                    exit={{opacity: 0, y: 20}}
-                                    transition={{duration: 0.3}}
-                                    className="flex flex-col items-center space-y-2"
-                                >
-                                    <button
-                                        className="bg-accent-dark text-white px-4 py-2 rounded-xl shadow-md"
-                                        onClick={() => {
-                                            setShowInput(true);
-                                            setShowSplitButtons(false);
-
-                                        }}
-                                    >
-                                        Enter Preferences
-                                    </button>
-                                    <button
-                                        className="bg-accent-dark text-white px-4 py-2 rounded-xl shadow-md"
-                                        onClick={randomSideQuestHandler}
-                                    >
-                                        Today's Side Quest
-                                    </button>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-
-                        <AnimatePresence>
-                            {showInput && (
-                                <motion.div
-                                    key="input-group"
-                                    initial={{opacity: 0, y: 20}}
-                                    animate={{opacity: 1, y: 0}}
-                                    exit={{opacity: 0, y: 20}}
-                                    transition={{duration: 0.3}}
-                                    className="flex flex-col items-center space-y-2"
-                                >
-                                    <input
-                                        type="text"
-                                        value={inputValue}
-                                        onChange={(e) => setInputValue(e.target.value)}
-                                        placeholder="Enter your preference"
-                                        className="px-4 py-2 rounded-lg border-2 border-gray-400 focus-within:border-none focus:ring-2 focus:ring-orange-400 w-64"
-                                    />
-                                    <div className="flex gap-2">
-                                        <button
-                                            className="bg-accent-main text-white px-4 py-2 rounded-lg"
-                                            onClick={() => {
-                                                // You can do something with inputValue here
-                                                setShowInput(false);
-                                                wePickANumber()
-                                                sendPromptRequestForSideQuest();
-                                            }}
-                                        >
-                                            Submit
-                                        </button>
-                                        <button
-                                            className="bg-accent-dark text-white px-4 py-2 rounded-lg"
-                                            onClick={() => {
-                                                setShowInput(false);
-                                                setShowSplitButtons(true);
-                                            }}
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-
-                )}
-            </div>
-
-            {/* Stats Cards */}
-            <div
-                className="flex flex-col md:flex-row gap-4 w-full max-w-screen-sm md:max-w-screen-md lg:max-w-[80%] justify-center">
-                <Card title="Level 12" desc="Explorer">
-                    <FaStar className="text-accent-light w-7 h-7"/>
-                </Card>
-                <Card title="2450 XP" desc="Experience">
-                    <FaTrophy className="text-accent-light w-7 h-7"/>
-                </Card>
-                <Card title="28" desc="Places Visited">
-                    <FaMapLocation className="text-accent-light w-7 h-7"/>
-                </Card>
-                <Card title="#42" desc="Ranking">
-                    <FaCrown className="text-accent-light w-7 h-7"/>
-                </Card>
-            </div>
-
-            {/* Clickable Cards */}
-            <div
-                className="flex flex-col md:flex-row gap-4 w-full max-w-screen-sm md:max-w-screen-md lg:max-w-[80%] justify-center">
-                <CardClickable title="Questionnaire" link="/questionnaire">
-                    <FaClipboard className="text-accent-dark w-6 h-6"/>
-                </CardClickable>
-                <CardClickable title="Preferences" link="/settings">
-                    <FaSliders className="text-accent-dark w-6 h-6"/>
-                </CardClickable>
-                <CardClickable title="History" link="/history">
-                    <FaHistory className="text-accent-dark w-6 h-6"/>
-                </CardClickable>
-                <CardClickable title="Leaderboard" link="/leaderboard">
-                    <FaRankingStar className="text-accent-dark w-6 h-6"/>
-                </CardClickable>
-            </div>
-
+                {/* Clickable Cards */}
+                <div className="flex flex-col md:flex-row gap-4 w-[80%] justify-center">
+                    <CardClickable title="Questionnaire" link="/questionnaire">
+                        <FaClipboard className="text-accent-dark w-7 h-7"/>
+                    </CardClickable>
+                    <CardClickable title="Preferences" link="/settings">
+                        <FaSliders className="text-accent-dark w-7 h-7"/>
+                    </CardClickable>
+                    <CardClickable title="History" link="/history">
+                        <FaHistory className="text-accent-dark w-7 h-7"/>
+                    </CardClickable>
+                    <CardClickable title="Leaderboard" link="/leaderboard">
+                        <FaRankingStar className="text-accent-dark w-7 h-7"/>
+                    </CardClickable>
+                </div>
                 {/* Styled XP Progress Bar Card */}
                 <div
                     className="w-full max-w-screen-sm md:max-w-screen-md lg:max-w-[80%] max-w-xl bg-white rounded-xl p-4 shadow-md text-center">
@@ -443,23 +455,25 @@ const HomePage = ({session}) => {
                         </div>
                     </div>
                 )}
-                {showLoginWarning && (
-                    <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
-                        <div className="bg-white rounded-xl p-6 w-80 text-center shadow-lg">
-                            <h2 className="text-xl font-bold text-accent-main mb-2">Login Required</h2>
-                            <p className="text-gray-600 mb-4">You must be logged in to start a quest.</p>
-                            <button
-                                className="bg-accent-main text-white px-4 py-2 rounded hover:bg-accent-dark"
-                                onClick={() => setShowLoginWarning(false)}
-                            >
-                                Okay
-                            </button>
+                    {showLoginWarning && (
+                        <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
+                            <div className="bg-white rounded-xl p-6 w-80 text-center shadow-lg">
+                                <h2 className="text-xl font-bold text-accent-main mb-2">Login Required</h2>
+                                <p className="text-gray-600 mb-4">You must be logged in to start a quest.</p>
+                                <button
+                                    className="bg-accent-main text-white px-4 py-2 rounded hover:bg-accent-dark"
+                                    onClick={() => setShowLoginWarning(false)}
+                                >
+                                    Okay
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    )};
+                </>
                 )}
 
-        </main>
-);
-};
+                </main>
+                );
+            };
 
-export default HomePage;
+            export default HomePage;

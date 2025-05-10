@@ -151,7 +151,7 @@ const HomePage = ({session}) => {
         }
     };
     return (
-        <main className="flex flex-col items-center bg-background-default h-[100%] gap-4 p-4">
+        <main className="flex flex-col items-center bg-background-default h-screen gap-4 p-4">
             <h1 className="text-accent-main text-6xl font-bold text-center">Welcome to CityQuest</h1>
             <p className="text-gray-600 text-center max-w-md text-md font-semibold mb-5">
                 Explore your city, earn rewards, and unlock new adventures!

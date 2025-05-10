@@ -14,7 +14,7 @@ function App() {
 
     return (
         <Router>
-            <Navbar session={session} />
+            <Navbar session={session} setSession={setSession} />
             <Routes>
                 <Route path="/" element={<HomePage session={session}/>} />
                 <Route path="/login" element={<LoginPage setSession={setSession} />} />

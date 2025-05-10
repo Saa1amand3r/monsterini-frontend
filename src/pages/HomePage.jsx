@@ -151,14 +151,14 @@ const HomePage = ({session}) => {
         }
     };
     return (
-        <main className="flex flex-col items-center bg-background-default h-screen gap-4 p-4">
+        <main className="flex flex-col items-center bg-background-default h-[100%] md:h-screen gap-4 p-4">
             <h1 className="text-accent-main text-6xl font-bold text-center">Welcome to CityQuest</h1>
             <p className="text-gray-600 text-center max-w-md text-md font-semibold mb-5">
                 Explore your city, earn rewards, and unlock new adventures!
             </p>
 
             {/* Map Container with overlayed button(s) */}
-            <div className="relative w-[80%] h-[30%]">
+            <div className="relative w-[80%] h-96">
                 <MapContainer
                     center={[51.2194, 4.4025]}
                     zoom={13}

@@ -1,9 +1,10 @@
 import React from "react";
+import {Link} from "react-router-dom";
 
 const CardClickable = ({ title, desc, link, children }) => {
     return (
-        <a
-            href={link}
+        <Link
+            to={link}
             className="bg-white shadow rounded-lg text-center flex flex-col justify-center px-6 py-8 items-center flex-1 min-w-[200px] hover:shadow-lg transition"
         >
             <div className="flex justify-center items-center mb-2">
@@ -17,7 +18,7 @@ const CardClickable = ({ title, desc, link, children }) => {
                     {desc}
                 </p>
             )}
-        </a>
+        </Link>
     );
 };
 

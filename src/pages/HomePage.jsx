@@ -142,24 +142,25 @@ const HomePage = ({session}) => {
             return;
         }
         console.log(inputValue)
-        if (inputValue === "") {
-            alert("Coming soon!");
-        } else {
-            const data = {
-                "userId": session.id,
-                "preference": inputValue,
-                "count": count
-            }
-            const response = await axios.post("http://localhost:8080/api/sidequest/generate", data)
-            // const response = await axios.get(`http://localhost:8080/api/sidequest/generate?` );
-            if (response.status !== 200) {
-                alert("Error occured! Try to reload the page.")
-                return;
-            }
 
-            setSideQuestPoints(response.data); // assuming response.data is the array
-            setShowOverlay(false);
+        if (inputValue === "") {
+            setInputValue("Surprise me")
         }
+
+        const data = {
+            "userId": session.id,
+            "preference": inputValue,
+            "count": count
+        }
+        const response = await axios.post("http://localhost:8080/api/sidequest/generate", data)
+        // const response = await axios.get(`http://localhost:8080/api/sidequest/generate?` );
+        if (response.status !== 200) {
+            alert("Error occured! Try to reload the page.")
+            return;
+        }
+
+        setSideQuestPoints(response.data); // assuming response.data is the array
+        setShowOverlay(false);
     };
     return (
         <main
@@ -414,13 +415,18 @@ const HomePage = ({session}) => {
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                         <div className="bg-white rounded-xl p-6 w-80">
                             {userPicksANumberShow && (
-                                <UserPicksNumber setShowModal={setShowModal} onConfirm={setCount}/>
+                                <UserPicksNumber setShowModal={setShowModal} onConfirm={(val) => {
+                                    setCount(val)
+                                    sendPromptRequestForSideQuest()
+                                    setShowModal(false);
+                                }}/>
                             )}
 
                             {wePickANumberShow && (
                                 <WePickNumber setShowModal={setShowModal} onConfirm={(val) => {
                                     setCount(val)
                                     sendPromptRequestForSideQuest()
+                                    setShowModal(false)
                                 }}/>
                             )}
 

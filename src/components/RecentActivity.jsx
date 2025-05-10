@@ -5,7 +5,7 @@ import { FaTree, FaUniversity, FaUtensils } from "react-icons/fa";
 
 const RecentActivity = () => {
     return (
-        <section className="flex flex-col rounded-xl bg-white w-full max-w-xl mx-auto px-2 sm:px-6 py-4 shadow">
+        <section className="flex flex-col rounded-xl bg-white w-full max-w-xl md:w-[80%] md:max-w-[80%] mx-auto px-2 sm:px-6 py-4 shadow">
             {/* Search and Filters */}
             <div className="flex flex-col gap-2 sm:gap-0 sm:flex-row justify-between items-stretch sm:items-center mb-4">
                 <SearchActivityField placeholder="Search history..." />

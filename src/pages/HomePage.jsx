@@ -126,6 +126,7 @@ const HomePage = ({session}) => {
                 "count": count
             }
             const response = await axios.post("http://localhost:8080/api/sidequest/generate", data)
+            // const response = await axios.get(`http://localhost:8080/api/sidequest/generate?` );
             if (response.status !== 200) {
                 alert("Error occured! Try to reload the page.")
                 return;
@@ -150,9 +151,9 @@ const HomePage = ({session}) => {
         }
     };
     return (
-        <main className="flex flex-col items-center bg-background-default h-screen gap-4 p-4">
-            <h1 className="text-accent-main text-6xl font-bold">Welcome to CityQuest</h1>
-            <p className="text-gray-600 text-center max-w-md text-md font-semibold">
+        <main className="flex flex-col items-center bg-background-default h-[100%] gap-4 p-4">
+            <h1 className="text-accent-main text-6xl font-bold text-center">Welcome to CityQuest</h1>
+            <p className="text-gray-600 text-center max-w-md text-md font-semibold mb-5">
                 Explore your city, earn rewards, and unlock new adventures!
             </p>
 

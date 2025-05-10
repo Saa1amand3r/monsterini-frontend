@@ -90,51 +90,10 @@ docker-compose up -d
 
 The application will be available at `http://localhost:8080`
 
-## API Documentation
-
-Once the application is running, you can access the Swagger UI documentation at:
-
-```
-http://localhost:8080/swagger-ui.html
-```
-
-### Key Endpoints
-
-- **User Management**
-  - `POST /api/users/register` - Register a new user
-  - `POST /api/users/login` - User login
-  - `GET /api/users/{id}` - Get user details
-  - `PUT /api/users/{id}` - Update user details
-
-- **Leaderboard**
-  - `GET /api/users/leaderboard` - Get top users by XP
-
-- **Geopoints**
-  - `GET /api/places/search` - Search for places by tags
-
-- **Side Quests**
-  - `GET /api/users/sidequest/{userId}` - Generate a side quest for a user
-
-- **Gemini AI**
-  - `GET /api/gemini/test` - Test the Gemini AI integration
-
 ## Data Import
 
 The application can import geopoint data from Parquet files. To enable this feature, uncomment the code in `ParquetReaderRunner.java` and ensure the Parquet file is available in the `src/main/resources/data/` directory.
 
-## Development
-
-### Building the project
-
-```bash
-./gradlew build
-```
-
-### Running tests
-
-```bash
-./gradlew test
-```
 ## Technologies Used
 
 - **Java 21**
@@ -145,10 +104,6 @@ The application can import geopoint data from Parquet files. To enable this feat
 - **Google Gemini AI**
 - **Apache Parquet**
 - **Swagger/OpenAPI**
-## Docker Support
-
-The application includes Docker Compose configuration for the PostgreSQL database. To run the entire application in Docker, you can create a Dockerfile and add it to the compose configuration.
-
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.

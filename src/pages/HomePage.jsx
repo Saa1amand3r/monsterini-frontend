@@ -30,6 +30,7 @@ const HomePage = ({session}) => {
     const [count, setCount] = useState(1)
     const [sideQuestPoints, setSideQuestPoints] = useState([]);
     const [showOverlay, setShowOverlay] = useState(true);
+    const [showLoginWarning, setShowLoginWarning] = useState(false);
 
     const iconMarkup = renderToStaticMarkup(
         <FaMapMarkerAlt style={{ color: "#FF5722", width: "32px", height: "32px" }} />
@@ -45,6 +46,10 @@ const HomePage = ({session}) => {
 
 
     const randomSideQuestHandler = () => {
+        if (!session) {
+            setShowLoginWarning(true);
+            return;
+        }
         setBoard(initialBoard);
         setGameOver(false);
         setIsPlayerTurn(true);
@@ -129,6 +134,10 @@ const HomePage = ({session}) => {
     }
 
     const sendPromptRequestForSideQuest = async () => {
+        if (!session) {
+            setShowLoginWarning(true);
+            return;
+        }
         console.log(inputValue)
         if (inputValue === "") {
             alert("Coming soon!");
@@ -360,6 +369,21 @@ const HomePage = ({session}) => {
                     </div>
                 </div>
             )}
+            {showLoginWarning && (
+                <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
+                    <div className="bg-white rounded-xl p-6 w-80 text-center shadow-lg">
+                        <h2 className="text-xl font-bold text-accent-main mb-2">Login Required</h2>
+                        <p className="text-gray-600 mb-4">You must be logged in to start a quest.</p>
+                        <button
+                            className="bg-accent-main text-white px-4 py-2 rounded hover:bg-accent-dark"
+                            onClick={() => setShowLoginWarning(false)}
+                        >
+                            Okay
+                        </button>
+                    </div>
+                </div>
+            )}
+
         </main>
     );
 };

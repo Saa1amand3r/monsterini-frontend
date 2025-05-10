@@ -5,6 +5,8 @@ import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisteringPage from "./pages/RegisteringPage";
+import Questionnaire from "./pages/Questionnaire";
+
 
 function App() {
     const [session, setSession] = useState(null);
@@ -16,6 +18,7 @@ function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<LoginPage setSession={setSession} />} />
                 <Route path="/register" element={<RegisteringPage setSession={setSession} />} />
+                <Route path={"/questionnaire"} element={<Questionnaire/>} />
             </Routes>
         </Router>
     );

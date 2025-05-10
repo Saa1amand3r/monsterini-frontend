@@ -38,7 +38,8 @@ function Navbar({ session }) {
                     </>
                 )}
                 {session && (
-                    <li className="text-sm font-medium">Hello, {session.name}!</li>
+                    <li className="text-sm font-medium">Hello, {session.userName}!</li>
+
                 )}
             </ul>
         </nav>

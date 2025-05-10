@@ -5,7 +5,7 @@ function Navbar({ session }) {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <nav className="bg-white shadow-md px-4 py-3 flex items-center justify-between relative">
+        <nav className="shadow-md px-4 py-3 flex items-center justify-between relative bg-background-default">
             <h2 className="text-xl font-bold">Monsterini side questini</h2>
 
             {/* Hamburger button */}
@@ -22,7 +22,7 @@ function Navbar({ session }) {
             <ul
                 className={`${
                     isOpen ? "flex" : "hidden"
-                } flex-col items-center text-center absolute top-16 left-1/2 -translate-x-1/2 w-[70%] md:translate-x-0 md:left-auto md:top-auto md:static md:flex-row md:flex md:items-center gap-4 md:gap-6 bg-white md:bg-transparent px-4 md:px-0 py-2 md:py-0 z-10`}
+                } flex-col items-center text-center md:justify-left absolute top-16 left-1/2 -translate-x-1/2 w-[70%] md:translate-x-0 md:left-auto md:top-auto md:static md:flex-row md:flex md:items-center gap-4 md:gap-6 bg-white md:bg-transparent px-4 md:px-0 py-2 md:py-0 z-10`}
             >
                 <li>
                     <Link to="/" onClick={() => setIsOpen(false)}>Home</Link>

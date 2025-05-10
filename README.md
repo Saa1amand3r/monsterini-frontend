@@ -9,7 +9,6 @@ It all starts with a fun, personalized questionnaire to get to know your vibe. B
 
 For the bold and the curious, there's also a Leaderboard where you can climb the ranks and prove you're the ultimate explorer of Antwerp’s hidden side. Will you claim the title of Nichest of Them All?
 
-
 # Why CityQuest? Your Adventure, Their Opportunity.
 
 CityQuest isn’t just a game—it’s a movement. A movement to reclaim local culture, empower small businesses, and make exploration fun again.
@@ -25,21 +24,6 @@ Whether you're a local guide or hosting a walking tour, CityQuest becomes your d
 ## Built for the Curious
 
 Whether you're a student, a tourist, or a lifelong local—CityQuest transforms the city into an interactive playground where every back alley might hold your next big XP boost.
-## Available Scripts
-
-- **`npm start`**  
-  Runs the app in development mode with hot reload.
-
-- **`npm test`**  
-  Opens the interactive test runner powered by Testing Library and Jest.
-
-- **`npm run build`**  
-  Builds the app for production (outputs to `/build`).
-
-- **`npm run eject`**  
-  (Advanced) Ejects the configuration for full customization. Not reversible.
-
----
 # Monsterini Backend
 
 A Spring Boot backend application for the Monsterini game, a location-based gamified experience that generates personalized side quests for users based on their preferences and nearby points of interest.
@@ -52,43 +36,6 @@ A Spring Boot backend application for the Monsterini game, a location-based gami
 - **AI-Generated Side Quests**: Personalized quests using Google's Gemini AI
 - **Questionnaire System**: Collect user preferences to enhance quest generation
 - **RESTful API**: Comprehensive API for frontend integration
-
-
-## Prerequisites
-- Java 21 or higher
-- Docker and Docker Compose
-- Google Gemini API key
-
-## Setup Instructions
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/yourusername/monsterini-backendini.git
-cd monsterini-backendini
-```
-
-### 2. Configure environment variables
-
-Create a `.env` file in the project root with the following content:
-
-```
-GEMINI_API_KEY=your_gemini_api_key_here
-```
-
-### 3. Start the PostgreSQL database
-
-```bash
-docker-compose up -d
-```
-
-### 4. Build and run the application
-
-```bash
-./gradlew bootRun
-```
-
-The application will be available at `http://localhost:8080`
 
 ## Data Import
 
